@@ -7,6 +7,7 @@
       <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
     </p>
     <h3>Installed CLI Plugins</h3>
+    <button v-if="show" @click="installer">Install App</button>
     <ul>
       <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
       <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
@@ -35,6 +36,35 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  data() {
+    return {
+      show: false,
+      installer: undefined
+    }
+  },
+  created() {
+    let installPrompt;
+
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      installPrompt = e;
+      this.show = true;
+      console.log('inside before install prompt',this.show)
+    })
+
+    this.installer = () => {
+      this.show = false;
+      installPrompt.prompt();
+      installPrompt.userChoice.then(result => {
+        if(result.outcome === "accepted") {
+          console.log("User accepted");
+        } else {
+          console.log("User denied")
+        }
+      })
+      installPrompt = null;
+    }
   }
 }
 </script>
